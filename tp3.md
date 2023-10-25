@@ -42,3 +42,76 @@ listening on enp0s3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 ...
 ```
 
+# II. Routage
+
+## 1. Mise en place du routage
+
+### 🌞Ajouter les routes statiques nécessaires pour que john et marcel puissent se ping
+
+pour que john ping marcel
+```
+sudo ip route add 10.3.2.12 via 10.3.1.254 dev enp0s3
+```
+
+pour que marcel ping john
+```
+sudo ip route add 10.3.1.11 via 10.3.2.254 dev enp0s3
+```
+
+```
+[dany@localhost ~]$ ping 10.3.2.12
+PING 10.3.2.12 (10.3.2.12) 56(84) bytes of data.
+64 bytes from 10.3.2.12: icmp_seq=1 ttl=63 time=1.10 ms
+64 bytes from 10.3.2.12: icmp_seq=2 ttl=63 time=1.32 ms
+64 bytes from 10.3.2.12: icmp_seq=3 ttl=63 time=1.75 ms
+64 bytes from 10.3.2.12: icmp_seq=4 ttl=63 time=1.41 ms
+```
+
+## 2. Analyse de trames
+
+### 🌞Analyse des échanges ARP
+
+
+ordre | type tram | ip source | MAC source | IP Destination | MAC Destination
+ :---: | :---: | :---: | :---: | :---: | :---: 
+1 | ARP request | 10.3.2.12 | x | 10.3.2.254 | x 
+2 | ARP reply | 10.3.2.12 | x | x |  08:00:27:c8:89:4b
+3 | ping | 10.3.1.11 | x | 10.3.2.12 | x
+4 | pong| 10.3.2.12 | x | 10.3.1.11 | x
+
+## 3. Accès internet
+
+### 🌞Donnez un accès internet à vos machines - config routeur
+
+accès a internet 
+```
+[dany@localhost ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=14.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=115 time=16.6 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=115 time=159 ms
+```
+
+### 🌞Donnez un accès internet à vos machines - config clients
+
+pour vérifier la connexion internet avec une ip 
+
+```
+[dany@localhost ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=114 time=167 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=114 time=16.2 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=114 time=31.7 ms
+```
+
+avec un nom de domaine 
+
+```
+[dany@localhost ~]$ ping google.com
+PING google.com (216.58.214.78) 56(84) bytes of data.
+64 bytes from par10s39-in-f14.1e100.net (216.58.214.78): icmp_seq=1 ttl=56 time=25.1 ms
+64 bytes from fra15s10-in-f78.1e100.net (216.58.214.78): icmp_seq=2 ttl=56 time=26.8 ms
+```
+
+### 🌞Analyse de trames
+
