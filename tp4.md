@@ -100,7 +100,7 @@ c'est la 2eme tram qui contient tous les infos proposés au client (DHCP offer)
 
 ```
 
-[dany@dhcp.tp4.b1 ~]$ ping youtube.com
+[dany@dhcp ~]$ ping youtube.com
 PING youtube.com (142.250.179.110) 56(84) bytes of data.
 64 bytes from reflectededge.reflected.net (142.250.179.110): icmp_seq=1 ttl=53 time=15.4 ms
 64 bytes from reflectededge.reflected.net (142.250.179.110): icmp_seq=2 ttl=53 time=14.7 ms
@@ -113,7 +113,7 @@ rtt min/avg/max/mdev = 14.719/18.407/25.135/4.764 ms
 
 ```
 
-[dany@node1.tp4.b1 ~]$ ping youtube.com
+[dany@node1 ~]$ ping youtube.com
 PING youtube.com (142.250.179.110) 56(84) bytes of data.
 64 bytes from 142.250.179.110 (142.250.179.110): icmp_seq=1 ttl=55 time=14.5 ms
 64 bytes from 142.250.179.110 (142.250.179.110): icmp_seq=2 ttl=55 time=26.5 ms
@@ -125,7 +125,7 @@ rtt min/avg/max/mdev = 14.465/23.051/28.193/6.110 ms
 ```
 
 ```
-[dany@node2.tp4.b1 ~]$ traceroute 8.8.8.8
+[dany@node2 ~]$ traceroute 8.8.8.8
 traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
  1  _gateway (10.4.1.254)  0.591 ms  0.597 ms  0.546 ms
  2  10.0.3.2 (10.0.3.2)  30.577 ms  30.570 ms  30.505 ms
@@ -136,14 +136,14 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 
 installation du logiciel
 ```
-[dany@dhcp.tp4.b1 ~]$ dnf -y install dhcp-server
+[dany@dhcp ~]$ dnf -y install dhcp-server
 ```
 
 ### 🌞 Rendu
 
 ```
-[dany@dhcp.tp4.b1 ~]$ sudo nano /etc/dhcp/dhcpd.conf
-[dany@dhcp.tp4.b1 ~]$ sudo cat /etc/dhcp/dhcpd.conf
+[dany@dhcp ~]$ sudo nano /etc/dhcp/dhcpd.conf
+[dany@dhcp ~]$ sudo cat /etc/dhcp/dhcpd.conf
 
 option domain-name     "tp4.dhcp";
 authoritative;
@@ -154,16 +154,16 @@ subnet 10.4.1.0 netmask 255.255.255.0 {
 ```
 
 ```
-[dany@dhcp.tp4.b1 ~]$ sudo systemctl enable --now dhcpd
+[dany@dhcp ~]$ sudo systemctl enable --now dhcpd
 Created symlink /etc/systemd/system/multi-user.target.wants/dhcpd.service → /usr/lib/systemd/system/dhcpd.service.
-[dany@dhcp.tp4.b1 ~]$ sudo firewall-cmd --add-service=dhcp
+[dany@dhcp ~]$ sudo firewall-cmd --add-service=dhcp
 success
-[dany@dhcp.tp4.b1 ~]$ sudo firewall-cmd --runtime-to-permanent
+[dany@dhcp ~]$ sudo firewall-cmd --runtime-to-permanent
 success
 ```
 
 ```
-[dany@dhcp.tp4.b1 ~]$ sudo systemctl status dhcpd
+[dany@dhcp ~]$ sudo systemctl status dhcpd
 dhcpd.service - DHCPv4 Server Daemon
    Loaded: loaded (/usr/lib/systemd/system/dhcpd.service; enabled; preset>
    Active: active (running) since Fri 2023-10-28 15:29:01 CEST; 4min 48s >
@@ -172,7 +172,7 @@ dhcpd.service - DHCPv4 Server Daemon
 ### 🌞 Test !
 
 ```
-[dany@dhcp.tp4.b1 ~]$ sudo cat /etc/sysconfig/network-scripts/ifcfg-enp0s3
+[dany@dhcp ~]$ sudo cat /etc/sysconfig/network-scripts/ifcfg-enp0s3
 DEVICE=enp0s3
 
 BOOTPROTO=dhcp
@@ -181,7 +181,7 @@ ONBOOT=yes
 
 ### 🌞 Prouvez que
 
-node1.tp4.b1 a bien récupéré une IP dynamiquement
+node1 a bien récupéré une IP dynamiquement
 ```
 [dany@localhost ~]$ ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
@@ -201,7 +201,7 @@ node1.tp4.b1 a bien récupéré une IP dynamiquement
 [dany@localhost ~]$ nmcli con show enp0s3
 ```
 
-node1.tp4.b1 a enregistré un bail DHCP
+node1 a enregistré un bail DHCP
 
 déterminer la date exacte de création du bail
  samedi 28 octobre 2023 16:19:21 GMT+02:00 DST
@@ -212,7 +212,7 @@ déterminer la date exacte d'expiration
 déterminer l'adresse IP du serveur DHCP
 dhcp_server_identifier = 10.4.1.253
 
-Vous pouvez ping router.tp4.b1 et node2.tp4.b1 grâce à cette nouvelle IP récupérée
+Vous pouvez ping router.tp4.b1 et node2 grâce à cette nouvelle IP récupérée
 
 ```
 [dany@localhost ~]$ ping 10.4.1.254

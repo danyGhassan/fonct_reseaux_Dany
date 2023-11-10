@@ -660,3 +660,7 @@ Connexions actives
 ```
 
 # II. Setup Virtuel
+
+## 1. SSH
+
+### 🌞 Examinez le trafic dans Wireshark
