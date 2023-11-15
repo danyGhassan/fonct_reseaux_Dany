@@ -666,3 +666,21 @@ Connexions actives
 ### 🌞 Examinez le trafic dans Wireshark
 
 -ssh utilise tcp
+
+### 🌞 Demandez aux OS
+
+```
+PS C:\Users\ghass> netstat
+
+Connexions actives
+
+  Proto  Adresse locale         Adresse distante       État
+  TCP    10.5.1.1:61845         10.5.1.11:ssh          ESTABLISHED
+```
+
+```
+[dany@node1 ~]$ ss -t
+State   Recv-Q   Send-Q     Local Address:Port     Peer Address:Port   Process
+ESTAB   0        52             10.5.1.11:ssh          10.5.1.1:61845
+
+```
