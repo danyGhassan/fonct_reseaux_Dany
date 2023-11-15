@@ -664,3 +664,5 @@ Connexions actives
 ## 1. SSH
 
 ### 🌞 Examinez le trafic dans Wireshark
+
+-ssh utilise tcp
