@@ -682,5 +682,146 @@ Connexions actives
 [dany@node1 ~]$ ss -t
 State   Recv-Q   Send-Q     Local Address:Port     Peer Address:Port   Process
 ESTAB   0        52             10.5.1.11:ssh          10.5.1.1:61845
+```
 
+# II. Setup Virtuel
+
+## 1. SSH
+
+### 🌞 Examinez le trafic dans Wireshark
+
+- déterminez si SSH utilise TCP ou UDP : TCP
+
+voir fichier tp5_trafic.pcapng
+
+### 🌞 Demandez aux OS
+
+- repérez, avec une commande adaptée (netstat ou ss), la connexion SSH depuis votre machine
+
+```
+PS C:\Users\ghass> netstat
+
+Connexions actives
+
+  Proto  Adresse locale         Adresse distante       État
+  TCP    10.5.1.1:28517         10.5.1.11:ssh          ESTABLISHED
+```
+
+- ET repérez la connexion SSH depuis la VM
+
+```
+[dany@node ~]$ ss -t
+State        Recv-Q        Send-Q               Local Address:Port               Peer Address:Port        Process
+ESTAB        0             52                       10.5.1.11:ssh                    10.5.1.1:28517
+```
+
+## 2. Routage
+
+### 🌞 Prouvez que
+
+- node1.tp5.b1 a un accès internet
+```
+[dany@node ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=26.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=115 time=12.3 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=115 time=13.4 ms
+^C
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 12.340/17.368/26.389/6.392 ms
+```
+- node1.tp5.b1 peut résoudre des noms de domaine publics (comme www.ynov.com)
+```
+[dany@node ~]$ ping ynov.com
+PING ynov.com (104.26.10.233) 56(84) bytes of data.
+64 bytes from 104.26.10.233 (104.26.10.233): icmp_seq=1 ttl=55 time=20.9 ms
+64 bytes from 104.26.10.233 (104.26.10.233): icmp_seq=2 ttl=55 time=32.6 ms
+^C
+--- ynov.com ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 20.872/26.758/32.644/5.886 ms
+```
+
+## 3. Serveur Web
+
+### 🌞 Installez le paquet nginx
+
+```
+[dany@web ~]$ sudo dnf install nginx -y
+```
+
+### 🌞 Créer le site web
+
+```
+[dany@web var]$ mkdir www
+```
+
+```
+[dany@web var]$ sudo mkdir www
+```
+
+```
+[dany@web site_web_nul]$ sudo nano index.html
+```
+
+### 🌞 Donner les bonnes permissions
+
+```
+[dany@web ~]$ sudo chown -R nginx:nginx /var/www/site_web_nul
+```
+
+### 🌞 Créer un fichier de configuration NGINX pour notre site web
+
+```
+[dany@web ~]$ sudo nano /etc/nginx/conf.d/site_web_nul.conf
+```
+
+### 🌞 Démarrer le serveur web !
+
+```
+[dany@web ~]$ sudo systemctl start nginx
+[dany@web ~]$ sudo systemctl status nginx
+● nginx.service - The nginx HTTP and reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; disabled; preset: disabled)
+     Active: active (running) since Fri 2023-11-17 22:25:58 CET; 11s ago
+    Process: 1374 ExecStartPre=/usr/bin/rm -f /run/nginx.pid (code=exited, status=0/SUCCESS)
+    Process: 1375 ExecStartPre=/usr/sbin/nginx -t (code=exited, status=0/SUCCESS)
+    Process: 1376 ExecStart=/usr/sbin/nginx (code=exited, status=0/SUCCESS)
+   Main PID: 1377 (nginx)
+      Tasks: 2 (limit: 4673)
+     Memory: 3.2M
+        CPU: 28ms
+     CGroup: /system.slice/nginx.service
+             ├─1377 "nginx: master process /usr/sbin/nginx"
+             └─1378 "nginx: worker process"
+
+Nov 17 22:25:58 web.tp5.b1 systemd[1]: Starting The nginx HTTP and reverse proxy server...
+Nov 17 22:25:58 web.tp5.b1 nginx[1375]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+Nov 17 22:25:58 web.tp5.b1 nginx[1375]: nginx: configuration file /etc/nginx/nginx.conf test is successful
+Nov 17 22:25:58 web.tp5.b1 systemd[1]: Started The nginx HTTP and reverse proxy server.
+```
+
+### 🌞 Ouvrir le port firewall
+
+```
+[dany@web ~]$ sudo firewall-cmd --add-port=80/tcp --permanent
+success
+[dany@web ~]$ sudo firewall-cmd --reload
+success
+```
+
+### 🌞 Visitez le serveur web !
+
+```
+[dany@node ~]$ sudo curl http://10.5.1.12
+<h1>MEOW</h1>
+```
+
+### 🌞 Visualiser le port en écoute
+
+```
+[dany@web ~]$ ss -atnl
+State          Recv-Q         Send-Q                  Local Address:Port                   Peer Address:Port         Process
+LISTEN         0              511                           0.0.0.0:80                          0.0.0.0:*
 ```
